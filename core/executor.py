@@ -2,14 +2,15 @@ import os
 import importlib
 import time
 
+
 COMMANDS_DIR = "commands"
 COMMAND_COOLDOWN = 6  # sekund
 
 class CommandExecutor:
-    def __init__(self):
+    def __init__(self, listener):
+        self.listener = listener
         self.handlers = []
-        self.last_text = None
-        self.last_time = 0
+        self.last_time = {}  # har bir alias uchun oxirgi bajarilish vaqti
         self.load_commands()
 
     def load_commands(self):
@@ -30,10 +31,12 @@ class CommandExecutor:
                     continue
 
                 for alias in aliases:
+                    alias_lower = alias.lower()
                     self.handlers.append({
-                        "alias": alias.lower(),
+                        "alias": alias_lower,
                         "execute": execute_fn
                     })
+                    self.last_time[alias_lower] = 0  # boshlang‘ich vaqt
 
                 print(f"✅ Command yuklandi: {name}")
 
@@ -47,19 +50,23 @@ class CommandExecutor:
 
         now = time.time()
 
-        # 🚫 BIR XIL BUYRUQNI QAYTA-QAYTA BAJARMASLIK
-        if text == self.last_text and (now - self.last_time) < COMMAND_COOLDOWN:
-            print("⏳ Takroriy buyruq — e’tiborsiz qoldirildi")
-            return
-
-        self.last_text = text
-        self.last_time = now
-
         for handler in self.handlers:
-            if handler["alias"] in text:
-                print(f"⚙️ Mos alias: {handler['alias']}")
+            alias = handler["alias"]
+            if alias in text:
+                # 🚫 ALIAS COOLDAOWN TEKSHIRUV
+                if (now - self.last_time.get(alias, 0)) < COMMAND_COOLDOWN:
+                    print(f"⏳ '{alias}' buyruq cooldownda — e’tiborsiz qoldirildi")
+                    return
+
+                # Cooldownni yangilash
+                self.last_time[alias] = now
+
+                print(f"⚙️ Mos alias: {alias}")
                 handler["execute"]({})
+                self.listener.mute_for_seconds(3)
                 print("✅ Buyruq bajarildi")
                 return
 
-        print("❔ Mos buyruq topilmadi")
+        
+
+

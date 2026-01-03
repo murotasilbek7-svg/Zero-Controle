@@ -4,7 +4,7 @@ from core.executor import CommandExecutor
 
 def main():
     listener = VoiceListener(uz_model_path="model/vosk-model-small-uz-0.22")
-    executor = CommandExecutor()
+    executor = CommandExecutor(listener)
     
 
     print("🔵 Zero Controle fon rejimida ishga tushdi...")

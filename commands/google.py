@@ -5,7 +5,6 @@ import time
 aliases = [
     "google",
     "googl",
-    "bu",
     "google ga kir",
     "googl ga kir",
     "go'yo",

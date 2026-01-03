@@ -1,6 +1,7 @@
 import sounddevice as sd
 import queue
 import json
+import time
 from vosk import Model, KaldiRecognizer
 
 class VoiceListener:
@@ -8,6 +9,7 @@ class VoiceListener:
         self.q = queue.Queue()
         self.model = Model(uz_model_path)
         self.rec = KaldiRecognizer(self.model, 16000)
+        self.mute_until = 0
 
         self.stream = sd.RawInputStream(
             samplerate=16000,
@@ -19,8 +21,13 @@ class VoiceListener:
         self.stream.start()
         print("🎧 Mikrofon tinglash boshlandi...")
 
-    def _callback(self, indata, frames, time, status):
+    def _callback(self, indata, frames, time_info, status):
+        if time.time() < self.mute_until:
+            return
         self.q.put(bytes(indata))
+
+    def mute_for_seconds(self, seconds):
+        self.mute_until = time.time() + seconds
 
     def listen(self):
         """Generator sifatida doimiy eshitish"""
