@@ -1,0 +1,19 @@
+import webbrowser
+import pygame
+import time
+aliases = [
+    "github",
+    "git hub",
+    "gitxob",
+    "gidhubga kir",
+    "git hubga kir",
+    "gitxobga kir"
+    ]
+
+
+def execute(args):
+    webbrowser.open("https://www.github.com")
+    print("🌐 GitHub veb-sayti ochildi.")
+    # pygame.mixer.init()
+    # # pygame.mixer.music.load("sounds/github.wav")
+    # pygame.mixer.music.play()
